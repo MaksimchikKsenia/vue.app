@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="../vueApp/css/reset.css">
+    <link rel="stylesheet" href="../vueApp/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../vueApp/css/style.css">
+    <title>Раса в Starcraft 2</title>
+</head>
+<body>
+    <div class="main">
+
+        <div class="app" v-show="showMain"> <!--это директива, показывает только выбранный экран-->
+            <div class="appHeader">
+                <img src="img/logo.png"  class="app_logo">
+            </div>
+            <div class="app_body">
+               
+                <button class="app_btn" @click="goToQuestions">
+                    <i class="fa fa-play-circle " aria-hidden="true"></i>
+                    <div class="app_btn-text">Начать</div>
+                </button>
+
+                <button class="app_btn" @click="goToAchi"><!--это директива, переходит на указанный экран-->
+                    <i class="fa fa-rocket " aria-hidden="true"></i>
+                    <div class="app_btn-text">Достижения</div>
+                </button>
+
+                <button class="app_btn" @click="goToSocial">
+                    <i class="fa fa-user  " aria-hidden="true"></i>
+                    <div class="app_btn-text">Автор</div>
+                </button>
+
+                <button class="app_btn btn_sound">
+                    <i class="fa fa-volume-off " aria-hidden="true"></i>
+                    <div class="app_btn-text">Звук</div>
+                </button>
+            </div>
+        </div>
+
+        <div class="app achievements" v-show="showAchi">
+            <div class="app_body">
+                <div class="app_body-inner">
+                    <h2 class="app_body_title">
+                        <i class="fa fa-trophy" aria-hidden="true"> Достижения</i>
+                    </h2>
+                    <div class="app_body-top">
+                        <div class="app_card">
+                            <div class="app_card-text">Счет</div>
+                            <div class="app_card-count">{{totalScore}}</div>
+                        </div>
+
+                        <div class="app_card">
+                            <div class="app_card-text">Открыто рас</div>
+                            <div class="app_card-count">{{totalRace}}</div>
+                        </div>
+
+                        <div class="app_card">
+                            <div class="app_card-text">Всего игр</div>
+                            <div class="app_card-count">{{totalGames}}</div>
+                        </div>
+
+                        <div class="app_card">
+                            <div class="app_card-text">Любимая раса</div>
+                            <div class="app_card-count">{{favRace}}</div>
+                        </div>
+                    </div>
+
+                    <div class="app_body-middle">
+                        <div class="app_result" 
+                        v-show="showRes[k]"
+                        v-for="(race,k) in results"
+                        @click="goToResults(k)">
+                            <div class="app_result-score">
+                                <i class="fa fa-star" aria-hidden="true"></i>
+                                <div class="app_result-count">{{race.points}}</div>
+                            </div>
+                            <div class="app_result-name">{{race.name}}</div>
+                            <div class="app_result-amount">{{totalGame[k]}}</div>
+                        </div>
+                    </div>
+
+                    <div class="app_body-bottom">
+                        <button class="app_btn btn_back btn_achievement" @click="goToMain">
+                            <i class="fa fa-reply" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="app" v-show="showQuestion">
+            <div class="appHeader">
+                <div class="app_header-inner">
+                    <div class="app_count">№{{number_q+1}}</div>
+                    <div class="app_text">{{questions[number_q][0]}}</div>
+                </div>
+            </div>
+            <div class="app_body">
+                <button class="app_btn"
+                v-for="(answer,i) in questions[number_q][1]"        
+                @click="nextQuestion(questions[number_q][2][i])">
+                    <div class="app_btn-text">{{answer}}</div>
+                </button>
+            </div>
+        </div>
+
+        <div class="app" v-show="showSocial">
+            <div class="app_body">
+                <a target="_blank" href="https://www.udemy.com/course/frontend-html-css-javascript/learn/quiz/5391249#overview" class="app_btn">
+                    <i class="fa fa-instagram" aria-hidden="true"></i>
+                    <div class="app_btn-text">Instagram</div>
+                </a>
+
+                <a target="_blank" href="https://www.udemy.com/course/frontend-html-css-javascript/learn/quiz/5391249#overview" class="app_btn">
+                    <i class="fa fa-telegram" aria-hidden="true"></i>
+                    <div class="app_btn-text">Telegram</div>
+                </a>
+
+                <a target="_blank" href="https://www.udemy.com/course/frontend-html-css-javascript/learn/quiz/5391249#overview" class="app_btn">
+                    <i class="fa fa-facebook " aria-hidden="true"></i>
+                    <div class="app_btn-text">Facebook </div>
+                </a>
+
+                <a target="_blank" href="https://www.udemy.com/course/frontend-html-css-javascript/learn/quiz/5391249#overview" class="app_btn">
+                    <i class="fa fa-github" aria-hidden="true"></i>
+                    <div class="app_btn-text">GitHub</div>
+                </a>
+
+                <a target="_blank" href="https://www.udemy.com/course/frontend-html-css-javascript/learn/quiz/5391249#overview" class="app_btn">
+                    <i class="fa fa-vk" aria-hidden="true"></i>
+                    <div class="app_btn-text">Вконтакте</div>
+                </a>
+
+                <div class="app_body-bottom">
+                    <button class="app_btn btn_back " @click="goToMain">
+                        <i class="fa fa-reply" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="app results" :data-race="resultRace" v-show="showResults">
+            <div class="app_body">
+                <div class="app-results-inner">
+                    <div class="results-title">{{results[resultRace].name}}</div>
+                    <div class="results_img">
+                        <img :src="'img/'+resultRace+'_logo.png'" alt="">
+                    </div>
+                    <div class="results_text-box">
+                        <p class="results-text">{{results[resultRace].description}}</p>
+                        <p class="results-quote">{{results[resultRace].quote1}}</p>
+                        <p class="results-quote">{{results[resultRace].quote2}}</p>
+                        <p class="results-author">{{results[resultRace].author}}</p>
+                    </div>
+                    <div>
+                        <button :class="'app_btn btn_back btn_'+resultRace " @click="goToAchi">
+                            <i class="fa fa-reply" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/vue.js"></script>
+    <script src="js/const.js"></script>
+    <script>
+        let app =new Vue({
+            el: '.main',
+            data: {
+                showMain: true,//главный экран включен
+                showSocial: false,//экран с соцсетями скрыт
+                showAchi: false,
+                showQuestion: false,
+                showResults: false,
+                number_q:0,
+                score:{
+                    'zerg':0,
+                    'primal':0,
+                    'protos':0,
+                    'taldarim':0,
+                    'terran':0,
+                },
+                totalGame: localStorage.getItem('sc2TotalGame')? JSON.parse(localStorage.getItem('sc2TotalGame')):{//parse-приводит объект к строке
+                    'zerg':0,
+                    'primal':0,
+                    'protos':0,
+                    'taldarim':0,
+                    'terran':0,
+                    'infested':0,
+                    'hybrid':0, 
+                },
+                totalGames: localStorage.getItem('sc2TotalGames') ? localStorage.getItem('sc2TotalGames'): 0,
+                questions:questions,
+                resultRace:'infested',
+                results:results,
+                
+                
+
+            },
+
+            methods:{
+                goToMain(){
+                this.showMain= true
+                this.showSocial= false
+                this.showAchi= false
+                this.showQuestion= false
+                this.showResults= false
+                },
+
+                goToSocial(){
+                this.showMain= false
+                this.showSocial= true
+                this.showAchi= false
+                this.showQuestion= false
+                this.showResults= false
+                },
+
+                goToAchi(){
+                    if(this.totalGames>0){
+                this.showMain= false
+                this.showSocial= false
+                this.showAchi= true
+                this.showQuestion= false
+                this.showResults= false
+                    }
+                    else{
+                        this.goToQuestions()
+                    }
+                },
+                 goToQuestions()
+                 {
+                    this.score={
+                        'zerg':0,
+                        'primal':0,
+                        'protos':0,
+                        'taldarim':0,
+                        'terran':0,
+                    },
+                    this.showMain= false
+                    this.showSocial= false
+                    this.showAchi= false
+                    this.showQuestion= true
+                    this.showResults= false
+                 },
+
+                 goToResults(race){
+                this.showMain= false
+                this.showSocial= false
+                this.showAchi= false
+                this.showQuestion= false
+                this.showResults= true
+                this.resultRace = race
+                },
+
+                nextQuestion(point){
+                    if(this.number_q==24){
+                        this.number_q = 0
+                        this.endGame()
+                    }
+                    else{
+                        this.number_q++
+                    }
+                    eval(point)
+                },
+                
+                endGame(){
+                    this.totalGames++
+                    localStorage.setItem('sc2TotalGames', this.totalGames)
+                    //зерг
+                    if(this.score.zerg>this.score.protos && this.score.zerg > this.score.terran &&
+                    this.score.primal<8 && Math.abs(this.score.protos - this.score.zerg) >3){
+                        this.goToResults('zerg')
+                        this.totalGame.zerg++
+                    }
+                    //primal
+                    else if(this.score.primal>this.score.protos && this.score.primal > this.score.terran &&
+                    this.score.primal==8 ){
+                        this.goToResults('primal')
+                        this.totalGame.primal++
+                    }
+                    //protos
+                    else if(this.score.protos>this.score.zerg && this.score.protos > this.score.terran &&
+                    this.score.taldarim <5 && Math.abs(this.score.protos - this.score.zerg) >3 ){
+                        this.goToResults('protos')
+                        this.totalGame.protos++
+                    }
+                    //taldarim
+                    else if(this.score.protos>this.score.zerg && this.score.protos > this.score.terran &&
+                    this.score.taldarim ==5 ){
+                        this.goToResults('taldarim')
+                        this.totalGame.taldarim++
+                    }
+                    //terran
+                    else if(this.score.terran>this.score.zerg && this.score.terran > this.score.protos ){
+                        this.goToResults('terran')
+                        this.totalGame.terran++
+                    }
+                    //hybrid
+                    else if(Math.abs(this.score.protos - this.score.zerg) <=3){
+                        this.goToResults('hybrid')
+                        this.totalGame.hybrid++
+                    }
+                    //infested
+                    else {
+                        this.goToResults('infested')
+                        this.totalGame.infested++
+                    }
+                    localStorage.setItem('sc2TotalGame', JSON.stringify(this.totalGame))//приводит объект к строке
+                },
+
+
+            },
+            //вычисляемые свойства
+            computed:{
+                totalScore(){
+             
+                    let score = 0
+                    for(let i in this.totalGame){
+                        score+=(this.totalGame[i]*results[i].points)
+                    }
+                    return score
+                
+                },
+
+                totalRace(){
+                    let count =0
+                    for(let i in this.totalGame){
+                        if(this.totalGame[i]>0)count++
+                    }
+                    return count
+                },
+
+                favRace(){
+                    let max ='zerg'
+                    for(let i in this.totalGame){
+                       if( this.totalGame[i]>this.totalGame[max]){
+                            max=i
+                        }
+                        
+                    }
+                    
+                    return results[max].name
+                },
+
+                showRes(){
+                    return{
+                        'zerg':this.totalGame.zerg>0 ? true: false,
+                        'primal': this.totalGame.primal>0 ? true: false,
+                        'protos':this.totalGame.protos>0 ? true: false,
+                        'taldarim':this.totalGame.taldarim>0 ? true: false,
+                        'terran':this.totalGame.terran>0 ? true: false,
+                        'infested':this.totalGame.infested>0 ? true: false,
+                        'hybrid':this.totalGame.hybrid>0 ? true: false,
+                    }
+                }
+            }
+        
+        })
+
+        let audio = new Audio('audio/soundtrack.mp3')
+        let audio_btn = document.querySelector('.btn_sound')
+        let audio_icon = document.querySelector('.btn_sound i')
+        audio.muted = true
+        audio.autoplay = true
+        audio.volume = 0.2
+       
+        audio.addEventListener('loadedmetadata', function(){
+            audio.currentTime = 0+Math.random() * (audio.duration +1 -0)
+          
+        })
+        
+
+        audio_btn.addEventListener('click', function(){
+            if(audio.muted){
+                audio.muted = false
+                audio_icon.classList.add('fa-volume-up')
+                audio_icon.classList.remove('fa-volume-off')
+            }
+             else if(!audio.muted){
+                audio.muted = true
+                audio_icon.classList.add('fa-volume-off')
+                audio_icon.classList.remove('fa-volume-up')
+            }
+        })
+    </script>
+</body>
+</html>
